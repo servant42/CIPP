@@ -1,5 +1,6 @@
 import { Layout as DashboardLayout } from "/src/layouts/index.js";
 import { CippTablePage } from "/src/components/CippComponents/CippTablePage.jsx";
+import { PersonAdd, PersonRemove, LocationOn } from "@mui/icons-material";
 
 const Page = () => {
   const pageTitle = "Teams Business Voice";
@@ -9,27 +10,36 @@ const Page = () => {
     {
       label: "Assign User",
       type: "POST",
+      icon: <PersonAdd />,
       url: "/api/ExecTeamsVoicePhoneNumberAssignment",
       data: {
         PhoneNumber: "TelephoneNumber",
-        TenantFilter: "TenantFilter",
         PhoneNumberType: "NumberType",
         locationOnly: false,
       },
-      modalDropdown: {
-        url: "/api/listUsers?TenantFilter=TenantFilter",
-        labelField: "displayName",
-        valueField: "userPrincipalName",
-      },
-      confirmText: "Select the User to assign.",
+      fields: [
+        {
+          type: "autoComplete",
+          name: "input",
+          label: "Select User",
+          multiple: false,
+          creatable: false,
+          api: {
+            url: "/api/listUsers",
+            labelField: (input) => `${input.displayName} (${input.userPrincipalName})`,
+            valueField: "userPrincipalName",
+          },
+        },
+      ],
+      confirmText: "Select the User to assign the phone number to.",
     },
     {
       label: "Unassign User",
       type: "POST",
+      icon: <PersonRemove />,
       url: "/api/ExecRemoveTeamsVoicePhoneNumberAssignment",
       data: {
         PhoneNumber: "TelephoneNumber",
-        TenantFilter: "TenantFilter",
         AssignedTo: "AssignedTo",
         PhoneNumberType: "NumberType",
       },
@@ -38,17 +48,24 @@ const Page = () => {
     {
       label: "Set Emergency Location",
       type: "POST",
+      icon: <LocationOn />,
       url: "/api/ExecTeamsVoicePhoneNumberAssignment",
       data: {
         PhoneNumber: "TelephoneNumber",
-        TenantFilter: "TenantFilter",
         locationOnly: true,
       },
-      modalDropdown: {
-        url: "/api/ListTeamsLisLocation?TenantFilter=TenantFilter",
-        labelField: "Description",
-        valueField: "LocationId",
-      },
+      fields: [
+        {
+          type: "autoComplete",
+          name: "input",
+          label: "Emergency Location",
+          api: {
+            url: "/api/ListTeamsLisLocation",
+            labelField: "Description",
+            valueField: "LocationId",
+          },
+        },
+      ],
       confirmText: "Select the Emergency Location.",
     },
   ];

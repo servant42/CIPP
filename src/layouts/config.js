@@ -37,11 +37,11 @@ export const nativeMenuItems = [
           { title: "Users", path: "/identity/administration/users" },
           { title: "Risky Users", path: "/identity/administration/risky-users" },
           { title: "Groups", path: "/identity/administration/groups" },
-          { title: "Devices", path: "/identity/administration/devices" },
           {
             title: "Group Templates",
             path: "/identity/administration/group-templates",
           },
+          { title: "Devices", path: "/identity/administration/devices" },
           { title: "Deleted Items", path: "/identity/administration/deleted-items" },
           { title: "Roles", path: "/identity/administration/roles" },
           { title: "JIT Admin", path: "/identity/administration/jit-admin" },
@@ -154,15 +154,15 @@ export const nativeMenuItems = [
         items: [
           {
             title: "Licence Report",
-            path: "/tenant/administration/list-licenses",
+            path: "/tenant/reports/list-licenses",
           },
           {
             title: "Sherweb Licence Report",
-            path: "/tenant/administration/list-csp-licenses",
+            path: "/tenant/reports/list-csp-licenses",
           },
           {
             title: "Consented Applications",
-            path: "/tenant/administration/application-consent",
+            path: "/tenant/reports/application-consent",
           },
         ],
       },
@@ -236,7 +236,6 @@ export const nativeMenuItems = [
           { title: "Autopilot Devices", path: "/endpoint/autopilot/list-devices" },
           { title: "Add Autopilot Device", path: "/endpoint/autopilot/add-device" },
           { title: "Profiles", path: "/endpoint/autopilot/list-profiles" },
-          { title: "Add Profile", path: "/endpoint/autopilot/add-profile" },
           { title: "Status Pages", path: "/endpoint/autopilot/list-status-pages" },
           { title: "Add Status Page", path: "/endpoint/autopilot/add-status-page" },
         ],
@@ -245,7 +244,7 @@ export const nativeMenuItems = [
         title: "Device Management",
         path: "/endpoint/MEM",
         items: [
-          { title: "Devices", path: "/endpoint/reports/devices" },
+          { title: "Devices", path: "/endpoint/MEM/devices" },
           { title: "Configuration Policies", path: "/endpoint/MEM/list-policies" },
           { title: "Compliance Policies", path: "/endpoint/MEM/list-compliance-policies" },
           { title: "Protection Policies", path: "/endpoint/MEM/list-appprotection-policies" },
@@ -263,7 +262,7 @@ export const nativeMenuItems = [
     ],
   },
   {
-    title: "Teams & Sharepoint",
+    title: "Teams & SharePoint",
     type: "header",
     icon: (
       <SvgIcon>
@@ -301,7 +300,7 @@ export const nativeMenuItems = [
     items: [
       {
         title: "Administration",
-        path: "/email/Administration",
+        path: "/email/administration",
         items: [
           { title: "Mailboxes", path: "/email/administration/mailboxes" },
           { title: "Deleted Mailboxes", path: "/email/administration/deleted-mailboxes" },
@@ -316,17 +315,17 @@ export const nativeMenuItems = [
       },
       {
         title: "Transport",
-        path: "/email/Transport",
+        path: "/email/transport",
         items: [
           { title: "Transport rules", path: "/email/transport/list-rules" },
           {
             title: "Transport Templates",
             path: "/email/transport/list-templates",
           },
-          { title: "Connectors", path: "/email/connectors/list-connectors" },
+          { title: "Connectors", path: "/email/transport/list-connectors" },
           {
             title: "Connector Templates",
-            path: "/email/connectors/list-connector-templates",
+            path: "/email/transport/list-connector-templates",
           },
         ],
       },
@@ -336,8 +335,11 @@ export const nativeMenuItems = [
         items: [
           { title: "Spamfilter", path: "/email/spamfilter/list-spamfilter" },
           { title: "Spamfilter templates", path: "/email/spamfilter/list-templates" },
-          { title: "Connection filter", path: "/email/connectionfilter/list-connectionfilter" },
-          { title: "Connection filter templates", path: "/email/connectionfilter/list-templates" },
+          { title: "Connection filter", path: "/email/spamfilter/list-connectionfilter" },
+          {
+            title: "Connection filter templates",
+            path: "/email/spamfilter/list-connectionfilter-templates",
+          },
         ],
       },
       {
@@ -377,6 +379,10 @@ export const nativeMenuItems = [
             title: "Shared Mailbox with Enabled Account",
             path: "/email/reports/SharedMailboxEnabledAccount",
           },
+          {
+            title: "Global Address List",
+            path: "/email/reports/global-address-list",
+          },
         ],
       },
     ],
@@ -396,11 +402,11 @@ export const nativeMenuItems = [
         items: [
           {
             title: "Graph Explorer",
-            path: "/tenant/administration/graph-explorer",
+            path: "/tenant/tools/graph-explorer",
           },
           {
             title: "Application Approval",
-            path: "/tenant/administration/appapproval",
+            path: "/tenant/tools/appapproval",
           },
           { title: "Tenant Lookup", path: "/tenant/tools/tenantlookup" },
 
@@ -408,7 +414,7 @@ export const nativeMenuItems = [
 
           {
             title: "Individual Domain Check",
-            path: "/tenant/standards/individual-domains",
+            path: "/tenant/tools/individual-domains",
           },
         ],
       },
@@ -421,14 +427,14 @@ export const nativeMenuItems = [
           { title: "Message Viewer", path: "/email/tools/message-viewer" },
         ],
       },
-      // {
-      //   title: "Dark Web Tools",
-      //   path: "/tools/darkweb",
-      //   items: [
-      //     { title: "Tenant Breach Lookup", path: "/tools/tenantbreachlookup" },
-      //     { title: "Breach Lookup", path: "/tools/breachlookup" },
-      //   ],
-      // },
+      {
+        title: "Dark Web Tools",
+        path: "/tools/darkweb",
+        items: [
+          { title: "Tenant Breach Lookup", path: "/tools/tenantbreachlookup" },
+          { title: "Breach Lookup", path: "/tools/breachlookup" },
+        ],
+      },
       {
         title: "Template Library",
         path: "/tools/templatelib",
@@ -468,7 +474,12 @@ export const nativeMenuItems = [
             title: "Timers",
             path: "/cipp/advanced/timers",
             roles: ["superadmin"],
-          }
+          },
+          {
+            title: "Table Maintenance",
+            path: "/cipp/advanced/table-maintenance",
+            roles: ["superadmin"],
+          },
         ],
       },
     ],

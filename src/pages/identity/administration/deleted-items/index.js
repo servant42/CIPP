@@ -1,5 +1,6 @@
 import { Layout as DashboardLayout } from "/src/layouts/index.js";
 import { CippTablePage } from "/src/components/CippComponents/CippTablePage.jsx";
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 
 const Page = () => {
   const pageTitle = "Deleted Items";
@@ -7,9 +8,10 @@ const Page = () => {
   const actions = [
     {
       label: "Restore Object",
-      type: "POST",
+      type: "GET",
+      icon: <RestoreFromTrashIcon />,
       url: "/api/ExecRestoreDeleted",
-      data: { TenantFilter: "Tenant", ID: "id" },
+      data: { ID: "id" },
       confirmText: "Are you sure you want to restore this user?",
       multiPost: false,
     },
@@ -46,7 +48,6 @@ const Page = () => {
     <CippTablePage
       title={pageTitle}
       apiUrl="/api/ListDeletedItems"
-      apiDataKey="Results"
       actions={actions}
       offCanvas={offCanvas}
       simpleColumns={columns}

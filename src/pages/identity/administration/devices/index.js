@@ -1,59 +1,70 @@
 import { CippTablePage } from "/src/components/CippComponents/CippTablePage.jsx";
 import { Layout as DashboardLayout } from "/src/layouts/index.js"; // had to add an extra path here because I added an extra folder structure. We should switch to absolute pathing so we dont have to deal with relative.
+import { useSettings } from "/src/hooks/use-settings";
+import { Visibility, CheckCircleOutline, Block, VpnKey, DeleteForever } from "@mui/icons-material";
 
 const Page = () => {
   const pageTitle = "Devices";
+  const tenantFilter = useSettings().currentTenant;
+
   const actions = [
-    // these are currently GET requests that should be converted to POST requests.
+    {
+      label: "View in Entra",
+      link: `https://entra.microsoft.com/${tenantFilter}/#view/Microsoft_AAD_Devices/DeviceDetailsMenuBlade/~/Properties/objectId/[id]/deviceId/`,
+      color: "info",
+      icon: <Visibility />,
+      target: "_blank",
+      multiPost: false,
+      external: true,
+    },
     {
       label: "Enable Device",
-      type: "GET",
+      type: "POST",
       url: "/api/ExecDeviceDelete",
       data: {
-        ID: "ID",
-        Action: "Enable",
+        ID: "id",
+        action: "!Enable",
       },
       confirmText: "Are you sure you want to enable this device?",
       multiPost: false,
+      icon: <CheckCircleOutline />,
     },
     {
       label: "Disable Device",
-      type: "GET",
+      type: "POST",
       url: "/api/ExecDeviceDelete",
       data: {
-        ID: "ID",
-        Action: "Disable",
+        ID: "id",
+        action: "!Disable",
       },
       confirmText: "Are you sure you want to disable this device?",
       multiPost: false,
+      icon: <Block />,
     },
     {
-      label: "Retrieve Bitlocker Keys",
+      label: "Retrieve BitLocker Keys",
       type: "GET",
       url: "/api/ExecGetRecoveryKey",
       data: {
-        GUID: "ID",
+        GUID: "id",
       },
-      confirmText: "Are you sure you want to retrieve the Bitlocker keys?",
+      confirmText: "Are you sure you want to retrieve the BitLocker keys?",
       multiPost: false,
+      icon: <VpnKey />,
     },
     {
       label: "Delete Device",
-      type: "GET",
+      type: "POST",
       url: "/api/ExecDeviceDelete",
       data: {
-        ID: "ID",
-        Action: "Delete",
+        ID: "id",
+        action: "!Delete",
       },
       confirmText: "Are you sure you want to delete this device?",
       multiPost: false,
+      icon: <DeleteForever />,
     },
   ];
-
-  const offCanvas = {
-    extendedInfoFields: ["createdDateTime", "displayName", "id"],
-    actions: actions,
-  };
 
   return (
     <CippTablePage
@@ -66,7 +77,6 @@ const Page = () => {
       }}
       apiDataKey="Results"
       actions={actions}
-      offCanvas={offCanvas}
       simpleColumns={[
         "displayName",
         "accountEnabled",
@@ -77,6 +87,7 @@ const Page = () => {
         "operatingSystem",
         "operatingSystemVersion",
         "profileType",
+        "approximateLastSignInDateTime",
       ]}
     />
   );

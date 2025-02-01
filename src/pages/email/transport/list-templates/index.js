@@ -2,6 +2,7 @@ import { Layout as DashboardLayout } from "/src/layouts/index.js";
 import { CippTablePage } from "/src/components/CippComponents/CippTablePage.jsx";
 import { EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "@mui/material";
+import { RocketLaunch } from "@mui/icons-material";
 import Link from "next/link";
 
 const Page = () => {
@@ -9,18 +10,12 @@ const Page = () => {
 
   const actions = [
     {
-      label: "View Template",
-      icon: <EyeIcon />, // Placeholder icon for developer customization
-      color: "success",
-      offCanvas: true,
-    },
-    {
       label: "Delete Template",
       type: "POST",
       url: "/api/RemoveTransportRuleTemplate",
       data: { ID: "GUID" },
       confirmText: "Do you want to delete the template?",
-      icon: <TrashIcon />, // Placeholder icon for developer customization
+      icon: <TrashIcon />,
       color: "danger",
     },
   ];
@@ -41,7 +36,11 @@ const Page = () => {
       simpleColumns={simpleColumns}
       cardButton={
         <>
-          <Button component={Link} href="/email/transport/list-rules/add">
+          <Button
+            component={Link}
+            href="/email/transport/list-rules/add"
+            startIcon={<RocketLaunch />}
+          >
             Deploy Template
           </Button>
         </>

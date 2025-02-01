@@ -4,7 +4,7 @@ import { useSettings } from "/src/hooks/use-settings";
 import { useRouter } from "next/router";
 import CippFormSkeleton from "/src/components/CippFormPages/CippFormSkeleton";
 import CalendarIcon from "@heroicons/react/24/outline/CalendarIcon";
-import { Mail, Forward } from "@mui/icons-material";
+import { Mail, Forward, Fingerprint } from "@mui/icons-material";
 import { HeaderedTabbedLayout } from "../../../../../layouts/HeaderedTabbedLayout";
 import tabOptions from "./tabOptions";
 import ReactTimeAgo from "react-time-ago";
@@ -25,12 +25,8 @@ const Page = () => {
   const { userId } = router.query;
 
   const tenant = userSettingsDefaults.currentTenant;
-  const currentSettings = userSettingsDefaults.currentSettings; // Assuming currentSettings is part of useSettings
+  const [formParams, setFormParams] = useState(false);
 
-  // State for form parameters
-  const [formParams, setFormParams] = useState(null);
-
-  // Fetch user details for the header
   const userRequest = ApiGetCall({
     url: `/api/ListUsers?UserId=${userId}&tenantFilter=${tenant}`,
     queryKey: `ListUsers-${userId}`,
@@ -44,6 +40,10 @@ const Page = () => {
         {
           icon: <Mail />,
           text: <CippCopyToClipBoard type="chip" text={userRequest.data?.[0]?.userPrincipalName} />,
+        },
+        {
+          icon: <Fingerprint />,
+          text: <CippCopyToClipBoard type="chip" text={userRequest.data?.[0]?.id} />,
         },
         {
           icon: <CalendarIcon />,
@@ -101,7 +101,6 @@ const Page = () => {
                     Test policies
                   </Button>
                 }
-                cardLabelBox={currentSettings?.ForwardAndDeliver ? <Forward /> : "-"} // Optional: Display an icon or placeholder
               >
                 {/* Form Starts Here */}
                 <form id="ca-test-form" onSubmit={formControl.handleSubmit(onSubmit)}>
@@ -234,7 +233,7 @@ const Page = () => {
                 title={"CA Test Results"}
                 simple={true}
                 simpleColumns={["displayName", "state", "policyApplies", "reasons"]}
-                data={postRequest.data?.data?.Results?.value}
+                data={postRequest.data?.data?.Results?.value || []}
               />
             </Grid>
           </Grid>

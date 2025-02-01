@@ -1,14 +1,5 @@
 import PropTypes from "prop-types";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  formControlLabelClasses,
-  Stack,
-  SvgIcon,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, CardHeader, Divider, Stack, SvgIcon, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
   Timeline,
@@ -24,7 +15,7 @@ import { ActionListItem } from "/src/components/action-list-item";
 import CheckIcon from "@heroicons/react/24/outline/CheckIcon";
 import CloseIcon from "@mui/icons-material/Close";
 import { useWatch } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import _ from "lodash";
 import CippFormComponent from "/src/components/CippComponents/CippFormComponent";
 import { CippFormTenantSelector } from "../CippComponents/CippFormTenantSelector";
@@ -75,6 +66,10 @@ const CippStandardsSideBar = ({
   edit,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [savedItem, setSavedItem] = useState(null);
+  const dialogAfterEffect = (id) => {
+    setSavedItem(id);
+  };
 
   const watchForm = useWatch({ control: formControl.control });
 
@@ -120,6 +115,15 @@ const CippStandardsSideBar = ({
             label="Template Name"
             formControl={formControl}
             placeholder="Enter a name for the template"
+            fullWidth
+          />
+          <Divider />
+          <CippFormComponent
+            type="richText"
+            name="description"
+            label="Description"
+            formControl={formControl}
+            placeholder="Enter a description for the template"
             fullWidth
           />
           <Divider />
@@ -208,6 +212,7 @@ const CippStandardsSideBar = ({
       </ActionList>
       <Divider />
       <CippApiDialog
+        dialogAfterEffect={(data) => dialogAfterEffect(data.id)}
         createDialog={createDialog}
         title="Add Standard"
         api={{
@@ -220,15 +225,21 @@ const CippStandardsSideBar = ({
           data: {
             tenantFilter: "tenantFilter",
             excludedTenants: "excludedTenants",
+            description: "description",
             templateName: "templateName",
             standards: "standards",
             ...(edit ? { GUID: "GUID" } : {}),
+            ...(savedItem ? { GUID: savedItem } : {}),
             runManually: "runManually",
           },
         }}
         row={formControl.getValues()}
         formControl={formControl}
-        relatedQueryKeys={"listStandardTemplates"}
+        relatedQueryKeys={[
+          "listStandardTemplates",
+          "listStandards",
+          `listStandardTemplates-${watchForm.GUID}`,
+        ]}
       />
     </Card>
   );

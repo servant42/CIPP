@@ -2,7 +2,8 @@ import { Button } from "@mui/material";
 import { CippTablePage } from "/src/components/CippComponents/CippTablePage.jsx";
 import { Layout as DashboardLayout } from "/src/layouts/index.js";
 import Link from "next/link";
-import { EyeIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import { Visibility, VisibilityOff, GroupAdd, Edit, LockOpen, Lock } from "@mui/icons-material";
 
 const Page = () => {
   const pageTitle = "Groups";
@@ -12,15 +13,15 @@ const Page = () => {
       label: "Edit Group",
       link: "/identity/administration/groups/edit?groupId=[id]",
       multiPost: false,
-      icon: <EyeIcon />,
+      icon: <Edit />,
       color: "success",
     },
     {
       label: "Hide from Global Address List",
       type: "GET",
       url: "/api/ExecGroupsHideFromGAL",
+      icon: <VisibilityOff />,
       data: {
-        TenantFilter: "TenantFilter",
         ID: "mail",
         GroupType: "calculatedGroupType",
         HidefromGAL: true,
@@ -33,8 +34,8 @@ const Page = () => {
       label: "Unhide from Global Address List",
       type: "GET",
       url: "/api/ExecGroupsHideFromGAL",
+      icon: <Visibility />,
       data: {
-        TenantFilter: "TenantFilter",
         ID: "mail",
         GroupType: "calculatedGroupType",
       },
@@ -46,8 +47,8 @@ const Page = () => {
       label: "Only allow messages from people inside the organisation",
       type: "GET",
       url: "/api/ExecGroupsDeliveryManagement",
+      icon: <Lock />,
       data: {
-        TenantFilter: "TenantFilter",
         ID: "mail",
         GroupType: "calculatedGroupType",
         OnlyAllowInternal: true,
@@ -59,9 +60,9 @@ const Page = () => {
     {
       label: "Allow messages from people inside and outside the organisation",
       type: "GET",
+      icon: <LockOpen />,
       url: "/api/ExecGroupsDeliveryManagement",
       data: {
-        TenantFilter: "TenantFilter",
         ID: "mail",
         GroupType: "calculatedGroupType",
       },
@@ -73,6 +74,7 @@ const Page = () => {
       label: "Delete Group",
       type: "GET",
       url: "/api/ExecGroupsDelete",
+      icon: <TrashIcon />,
       data: {
         ID: "id",
         GroupType: "calculatedGroupType",
@@ -100,12 +102,22 @@ const Page = () => {
       title={pageTitle}
       cardButton={
         <>
-          <Button component={Link} href="groups/add">
+          <Button component={Link} href="groups/add" startIcon={<GroupAdd />}>
             Add Group
           </Button>
         </>
       }
-      apiUrl="/api/ListGroups"
+      apiUrl="/api/ListGraphRequest"
+      apiData={{
+        Endpoint: "groups",
+        $select:
+          "id,createdDateTime,displayName,description,mail,mailEnabled,mailNickname,resourceProvisioningOptions,securityEnabled,visibility,organizationId,onPremisesSamAccountName,membershipRule,grouptypes,onPremisesSyncEnabled,resourceProvisioningOptions,userPrincipalName,assignedLicenses",
+        $count: true,
+        $orderby: "displayName",
+        $top: 999,
+        manualPagination: true,
+      }}
+      apiDataKey="Results"
       actions={actions}
       offCanvas={offCanvas}
       simpleColumns={[
@@ -115,6 +127,7 @@ const Page = () => {
         "mailEnabled",
         "mailNickname",
         "calculatedGroupType",
+        "assignedLicenses",
         "visibility",
         "onPremisesSamAccountName",
         "membershipRule",

@@ -44,6 +44,9 @@ const Page = () => {
   };
 
   const handleIntegrationTest = () => {
+    if (testQuery.waiting) {
+      actionTestResults.refetch();
+    }
     setTestQuery({
       url: "/api/ExecExtensionTest",
       data: {
@@ -98,7 +101,6 @@ const Page = () => {
           backButtonTitle="Integrations"
           headerText={extension.headerText}
           hideTitleText={true}
-          headerImage={logo}
         >
           <CardContent sx={{ pb: 0, mb: 0 }}>
             {logo && (
@@ -106,7 +108,7 @@ const Page = () => {
                 component="img"
                 src={logo}
                 alt={extension.name}
-                sx={{ width: "50%", mx: "auto" }}
+                sx={{ maxWidth: "50%", mx: "auto", maxHeight: "125px" }}
               />
             )}
             <Typography variant="body2" paragraph style={{ marginTop: "1em" }}>
@@ -117,51 +119,62 @@ const Page = () => {
                 {extension.alertText}
               </Alert>
             )}
-            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{ mb: 2, display: "flex", alignItems: "center" }}
+            >
               {extension?.hideTestButton !== true && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleIntegrationTest()}
-                  disabled={actionTestResults?.isLoading}
-                >
-                  <SvgIcon fontSize="small" style={{ marginRight: "8" }}>
-                    <BeakerIcon />
-                  </SvgIcon>
-                  Test
-                </Button>
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleIntegrationTest()}
+                    disabled={actionTestResults?.isLoading}
+                  >
+                    <SvgIcon fontSize="small" style={{ marginRight: "8" }}>
+                      <BeakerIcon />
+                    </SvgIcon>
+                    Test
+                  </Button>
+                </Box>
               )}
               {extension?.forceSyncButton && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleIntegrationSync()}
-                  disabled={actionSyncResults.isLoading}
-                >
-                  <SvgIcon fontSize="small" style={{ marginRight: "8" }}>
-                    <ArrowPathIcon />
-                  </SvgIcon>
-                  Force Sync
-                </Button>
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleIntegrationSync()}
+                    disabled={actionSyncResults.isLoading}
+                  >
+                    <SvgIcon fontSize="small" style={{ marginRight: "8" }}>
+                      <ArrowPathIcon />
+                    </SvgIcon>
+                    Force Sync
+                  </Button>
+                </Box>
               )}
               {extension?.links && (
                 <>
                   {extension.links.map((link, index) => (
-                    <Button
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      color="inherit"
-                      key={index}
-                    >
-                      <SvgIcon fontSize="small" style={{ marginRight: "8" }}>
-                        <ArrowTopRightOnSquareIcon />
-                      </SvgIcon>
-                      {link.name}
-                    </Button>
+                    <Box>
+                      <Button
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        color="inherit"
+                        key={index}
+                      >
+                        <SvgIcon fontSize="small" style={{ marginRight: "8" }}>
+                          <ArrowTopRightOnSquareIcon />
+                        </SvgIcon>
+                        {link.name}
+                      </Button>
+                    </Box>
                   ))}
                 </>
               )}
+
               <CippApiResults apiObject={actionTestResults} />
               <CippApiResults apiObject={actionSyncResults} />
             </Stack>
@@ -173,6 +186,7 @@ const Page = () => {
                 <Tab label="Settings" {...tabProps(0)} />
                 {extension?.mappingRequired && <Tab label="Tenant Mapping" {...tabProps(1)} />}
                 {extension?.fieldMapping && <Tab label="Field Mapping" {...tabProps(2)} />}
+                {extension?.id === "cippapi" && <Tab label="API Clients" {...tabProps(3)} />}
               </Tabs>
             </Box>
             <CippCardTabPanel value={value} index={0}>
@@ -186,6 +200,11 @@ const Page = () => {
             {extension?.fieldMapping && (
               <CippCardTabPanel value={value} index={2}>
                 <CippIntegrationFieldMapping />
+              </CippCardTabPanel>
+            )}
+            {extension?.id === "cippapi" && (
+              <CippCardTabPanel value={value} index={3}>
+                API Client component to go here
               </CippCardTabPanel>
             )}
           </Box>
