@@ -15,6 +15,8 @@ import {
   NotificationImportant,
   DataUsage,
   MailLock,
+  SettingsEthernet,
+  CalendarMonth,
 } from "@mui/icons-material";
 
 export const CippExchangeActions = () => {
@@ -39,7 +41,7 @@ export const CippExchangeActions = () => {
       data: {
         UserEmail: "UPN",
       },
-      confirmText: "Are you sure you want to send an MFA request?",
+      confirmText: "Are you sure you want to send an MFA request to [UPN]?",
       icon: <PhonelinkLock />,
     },
     {
@@ -51,7 +53,7 @@ export const CippExchangeActions = () => {
         ID: "UPN",
         MailboxType: "!Regular",
       },
-      confirmText: "Are you sure you want to convert this mailbox to a user mailbox?",
+      confirmText: "Are you sure you want to convert [UPN] to a user mailbox?",
       condition: (row) => row.recipientTypeDetails !== "UserMailbox",
     },
     {
@@ -63,7 +65,7 @@ export const CippExchangeActions = () => {
         ID: "UPN",
         MailboxType: "!Shared",
       },
-      confirmText: "Are you sure you want to convert this mailbox to a shared mailbox?",
+      confirmText: "Are you sure you want to convert [UPN] to a shared mailbox?",
       condition: (row) => row.recipientTypeDetails !== "SharedMailbox",
     },
     {
@@ -75,7 +77,7 @@ export const CippExchangeActions = () => {
         ID: "UPN",
         MailboxType: "!Room",
       },
-      confirmText: "Are you sure you want to convert this mailbox to a room mailbox?",
+      confirmText: "Are you sure you want to convert [UPN] to a room mailbox?",
       condition: (row) => row.recipientTypeDetails !== "RoomMailbox",
     },
     {
@@ -85,7 +87,7 @@ export const CippExchangeActions = () => {
       icon: <Archive />,
       url: "/api/ExecEnableArchive",
       data: { ID: "Id", username: "UPN" },
-      confirmText: "Are you sure you want to enable the online archive for this user?",
+      confirmText: "Are you sure you want to enable the online archive for [UPN]?",
       multiPost: false,
       condition: (row) => row.ArchiveGuid === "00000000-0000-0000-0000-000000000000",
     },
@@ -96,7 +98,7 @@ export const CippExchangeActions = () => {
       url: "/api/ExecEnableAutoExpandingArchive",
       data: { ID: "Id", username: "UPN" },
       confirmText:
-        "Are you sure you want to enable auto-expanding archive for this user? The archive must already be enabled.",
+        "Are you sure you want to enable auto-expanding archive for [UPN]? The archive must already be enabled.",
       multiPost: false,
       condition: (row) => row.ArchiveGuid !== "00000000-0000-0000-0000-000000000000",
     },
@@ -110,7 +112,7 @@ export const CippExchangeActions = () => {
         HidefromGAL: true,
       },
       confirmText:
-        "Are you sure you want to hide this mailbox from the global address list? This will not work if the user is AD Synced.",
+        "Are you sure you want to hide [UPN] from the global address list? This will not work if the user is AD Synced.",
       condition: (row) => row.HiddenFromAddressListsEnabled === false,
     },
     {
@@ -123,7 +125,7 @@ export const CippExchangeActions = () => {
         HidefromGAL: false,
       },
       confirmText:
-        "Are you sure you want to unhide this mailbox from the global address list? This will not work if the user is AD Synced.",
+        "Are you sure you want to unhide [UPN] from the global address list? This will not work if the user is AD Synced.",
       condition: (row) => row.HiddenFromAddressListsEnabled === true,
     },
     {
@@ -135,7 +137,7 @@ export const CippExchangeActions = () => {
         ID: "ExchangeGuid",
         UserPrincipalName: "UPN",
       },
-      confirmText: "Are you sure you want to start the managed folder assistant for this user?",
+      confirmText: "Are you sure you want to start the managed folder assistant for [UPN]?",
     },
     {
       label: "Delete Mailbox",
@@ -143,28 +145,26 @@ export const CippExchangeActions = () => {
       icon: <TrashIcon />,
       url: "/api/RemoveUser",
       data: { ID: "UPN" },
-      confirmText: "Are you sure you want to delete this mailbox?",
+      confirmText: "Are you sure you want to delete [UPN]?",
       multiPost: false,
     },
     {
-      label: "Copy Sent Items to Shared Mailbox",
+      label: "Copy Sent Items to for Delegated Mailboxes",
       type: "POST",
       url: "/api/ExecCopyForSent",
       data: { ID: "UPN", MessageCopyForSentAsEnabled: true },
-      confirmText: "Are you sure you want to enable Copy Sent Items to Shared Mailbox?",
+      confirmText: "Are you sure you want to enable Copy Sent Items on [UPN]?",
       icon: <MailOutline />,
-      condition: (row) =>
-        row.MessageCopyForSentAsEnabled === false && row.recipientTypeDetails === "SharedMailbox",
+      condition: (row) => row.MessageCopyForSentAsEnabled === false,
     },
     {
-      label: "Disable Copy Sent Items to Shared Mailbox",
+      label: "Disable Copy Sent Items for Delegated Mailboxes",
       type: "POST",
       url: "/api/ExecCopyForSent",
       data: { ID: "UPN", MessageCopyForSentAsEnabled: false },
-      confirmText: "Are you sure you want to disable Copy Sent Items to Shared Mailbox?",
+      confirmText: "Are you sure you want to disable Copy Sent Items on [UPN]?",
       icon: <MailOutline />,
-      condition: (row) =>
-        row.MessageCopyForSentAsEnabled === true && row.recipientTypeDetails === "SharedMailbox",
+      condition: (row) => row.MessageCopyForSentAsEnabled === true,
     },
     {
       label: "Set Litigation Hold",
@@ -220,6 +220,28 @@ export const CippExchangeActions = () => {
       ],
     },
     {
+      label: "Set Max Send/Receive Size",
+      type: "POST",
+      url: "/api/ExecSetMailboxEmailSize",
+      data: { UPN: "UPN", id: "ExternalDirectoryObjectId" },
+      confirmText: "Enter a size in from 1 to 150. Leave blank to not change.",
+      icon: <SettingsEthernet />,
+      fields: [
+        {
+          label: "Send Size(MB)",
+          name: "maxSendSize",
+          type: "number",
+          placeholder: "e.g. 35",
+        },
+        {
+          label: "Receive Size(MB)",
+          name: "maxReceiveSize",
+          type: "number",
+          placeholder: "e.g. 36",
+        },
+      ],
+    },
+    {
       label: "Set Send Quota",
       type: "POST",
       url: "/api/ExecSetMailboxQuota",
@@ -267,6 +289,107 @@ export const CippExchangeActions = () => {
           name: "quota",
           type: "textField",
           placeholder: "e.g. 1000MB, 10GB,1TB",
+        },
+      ],
+    },
+    {
+      label: "Set Calendar Processing",
+      type: "POST",
+      url: "/api/ExecSetCalendarProcessing",
+      data: { UPN: "UPN" },
+      confirmText: "Configure calendar processing settings for [UPN]",
+      icon: <CalendarMonth />,
+      condition: (row) => row.recipientTypeDetails === "RoomMailbox" || row.recipientTypeDetails === "EquipmentMailbox",
+      fields: [
+        {
+          label: "Automatically Process Meeting Requests",
+          name: "automaticallyProcess",
+          type: "switch",
+        },
+        {
+          label: "Automatically Accept Meeting Requests",
+          name: "automaticallyAccept",
+          type: "switch",
+        },
+        {
+          label: "Allow Conflicts",
+          name: "allowConflicts",
+          type: "switch",
+        },
+        {
+          label: "Maximum Number of Conflicts",
+          name: "maxConflicts",
+          type: "number",
+          placeholder: "e.g. 2",
+        },
+        {
+          label: "Allow Recurring Meetings",
+          name: "allowRecurringMeetings",
+          type: "switch",
+        },
+        {
+          label: "Schedule Only During Work Hours",
+          name: "scheduleOnlyDuringWorkHours",
+          type: "switch",
+        },
+        {
+          label: "Maximum Duration (Minutes)",
+          name: "maximumDurationInMinutes",
+          type: "number",
+          placeholder: "e.g. 240",
+        },
+        {
+          label: "Minimum Duration (Minutes)",
+          name: "minimumDurationInMinutes",
+          type: "number",
+          placeholder: "e.g. 30",
+        },
+        {
+          label: "Booking Window (Days)",
+          name: "bookingWindowInDays",
+          type: "number",
+          placeholder: "e.g. 30",
+        },
+        {
+          label: "Add Organizer to Subject",
+          name: "addOrganizerToSubject",
+          type: "switch",
+        },
+        {
+          label: "Delete Comments",
+          name: "deleteComments",
+          type: "switch",
+        },
+        {
+          label: "Delete Subject",
+          name: "deleteSubject",
+          type: "switch",
+        },
+        {
+          label: "Remove Private Property",
+          name: "removePrivateProperty",
+          type: "switch",
+        },
+        {
+          label: "Remove Canceled Meetings",
+          name: "removeCanceledMeetings",
+          type: "switch",
+        },
+        {
+          label: "Remove Old Meeting Messages",
+          name: "removeOldMeetingMessages",
+          type: "switch",
+        },
+        {
+          label: "Process External Meeting Messages",
+          name: "processExternalMeetingMessages",
+          type: "switch",
+        },
+        {
+          label: "Additional Response",
+          name: "additionalResponse",
+          type: "textField",
+          placeholder: "Additional text to add to responses",
         },
       ],
     },

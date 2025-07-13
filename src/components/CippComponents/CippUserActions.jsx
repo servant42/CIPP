@@ -8,6 +8,7 @@ import {
   Email,
   ForwardToInbox,
   GroupAdd,
+  LockClock,
   LockOpen,
   LockPerson,
   LockReset,
@@ -51,12 +52,30 @@ export const CippUserActions = () => {
     },
     {
       //tested
-
       label: "Create Temporary Access Password",
       type: "POST",
       icon: <Password />,
       url: "/api/ExecCreateTAP",
       data: { ID: "userPrincipalName" },
+      fields: [
+        {
+          type: "number",
+          name: "lifetimeInMinutes",
+          label: "Lifetime (Minutes)",
+          placeholder: "Leave blank for default"
+        },
+        {
+          type: "switch",
+          name: "isUsableOnce",
+          label: "One-time use only"
+        },
+        {
+          type: "datePicker",
+          name: "startDateTime",
+          label: "Start Date/Time (leave blank for immediate)",
+          dateTimeType: "datetime"
+        }
+      ],
       confirmText: "Are you sure you want to create a Temporary Access Password?",
       multiPost: false,
     },
@@ -154,7 +173,10 @@ export const CippUserActions = () => {
       type: "POST",
       icon: <NoMeetingRoom />,
       url: "/api/ExecSetOoO",
-      data: { user: "userPrincipalName", AutoReplyState: "Disabled" },
+      data: {
+        userId: "userPrincipalName",
+        AutoReplyState: { value: "Disabled" },
+      },
       confirmText: "Are you sure you want to disable the out of office?",
       multiPost: false,
     },
@@ -163,7 +185,33 @@ export const CippUserActions = () => {
       type: "POST",
       icon: <GroupAdd />,
       url: "/api/EditGroup",
-      data: { addMember: "userPrincipalName" },
+      customDataformatter: (row, action, formData) => {
+        let addMember = [];
+        if (Array.isArray(row)) {
+          row
+            .map((r) => ({
+              label: r.displayName,
+              value: r.userPrincipalName,
+              addedFields: {
+                id: r.id,
+              },
+            }))
+            .forEach((r) => addMember.push(r));
+        } else {
+          addMember.push({
+            label: row.displayName,
+            value: row.userPrincipalName,
+            addedFields: {
+              id: row.id,
+            },
+          });
+        }
+        return {
+          addMember: addMember,
+          tenantFilter: tenant,
+          groupId: formData.groupId,
+        };
+      },
       fields: [
         {
           type: "autoComplete",
@@ -180,10 +228,53 @@ export const CippUserActions = () => {
               groupName: "displayName",
             },
             queryKey: `groups-${tenant}`,
+            showRefresh: true,
           },
         },
       ],
       confirmText: "Are you sure you want to add the user to this group?",
+      multiPost: true,
+    },
+    {
+      label: "Manage Licenses",
+      type: "POST",
+      url: "/api/ExecBulkLicense",
+      icon: <CloudDone />,
+      data: { userIds: "id" },
+      multiPost: true,
+      fields: [
+        {
+          type: "radio",
+          name: "LicenseOperation",
+          label: "License Operation",
+          options: [
+            { label: "Add Licenses", value: "Add" },
+            { label: "Remove Licenses", value: "Remove" },
+            { label: "Replace Licenses", value: "Replace" },
+          ],
+          required: true,
+        },
+        {
+          type: "switch",
+          name: "RemoveAllLicenses",
+          label: "Remove All Existing Licenses",
+        },
+        {
+          type: "autoComplete",
+          name: "Licenses",
+          label: "Select Licenses",
+          multiple: true,
+          creatable: false,
+          api: {
+            url: "/api/ListLicenses",
+            labelField: "skuPartNumber",
+            valueField: "skuId",
+            queryKey: `licenses-${tenant}`,
+          },
+        },
+      ],
+      confirmText: "Are you sure you want to manage licenses for the selected users?",
+      multiPost: true,
     },
     {
       label: "Disable Email Forwarding",
@@ -222,7 +313,7 @@ export const CippUserActions = () => {
           name: "siteUrl",
           label: "Select a Site",
           multiple: false,
-          creatable: false,
+          creatable: true,
           api: {
             url: "/api/ListSites",
             data: { type: "SharePointSiteUsage", URLOnly: true },
@@ -283,6 +374,29 @@ export const CippUserActions = () => {
       multiPost: false,
     },
     {
+      label: "Set Password Never Expires",
+      type: "POST",
+      icon: <LockClock />,
+      url: "/api/ExecPasswordNeverExpires",
+      data: { userId: "id", userPrincipalName: "userPrincipalName" },
+      fields: [
+        {
+          type: "autoComplete",
+          name: "PasswordPolicy",
+          label: "Password Policy",
+          options: [
+            { label: "Disable Password Expiration", value: "DisablePasswordExpiration" },
+            { label: "Enable Password Expiration", value: "None" },
+          ],
+          multiple: false,
+          creatable: false,
+        },
+      ],
+      confirmText:
+        "Set Password Never Expires state for this user. If the password of the user is older than the set expiration date of the organization, the user will be prompted to change their password at their next login.",
+      multiPost: false,
+    },
+    {
       label: "Clear Immutable ID",
       type: "POST",
       icon: <Clear />,
@@ -308,7 +422,7 @@ export const CippUserActions = () => {
       type: "POST",
       icon: <TrashIcon />,
       url: "/api/RemoveUser",
-      data: { ID: "id" },
+      data: { ID: "id", userPrincipalName: "userPrincipalName" },
       confirmText: "Are you sure you want to delete this user?",
       multiPost: false,
     },

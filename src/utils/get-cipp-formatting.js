@@ -6,9 +6,6 @@ import {
   MailOutline,
   Shield,
   Description,
-  Group,
-  MeetingRoom,
-  GroupWork,
   GroupOutlined,
 } from "@mui/icons-material";
 import { Chip, Link, SvgIcon } from "@mui/material";
@@ -88,6 +85,22 @@ export const getCippFormatting = (data, cellName, type, canReceive, flatten = tr
       </CollapsibleChipList>
     );
   };
+
+  if (cellName === "baselineOption") {
+    return "Download Baseline";
+  }
+
+  if (cellName === "Severity" || cellName === "logsToInclude") {
+    if (Array.isArray(data)) {
+      return isText ? data.join(", ") : renderChipList(data);
+    } else {
+      return isText ? (
+        data
+      ) : (
+        <Chip variant="outlined" label={data.label ?? data} size="small" color="info" />
+      );
+    }
+  }
 
   //if the cellName starts with portal_, return text, or a link with an icon
   if (cellName.startsWith("portal_")) {
@@ -173,6 +186,15 @@ export const getCippFormatting = (data, cellName, type, canReceive, flatten = tr
     return isText ? "Password hidden" : <CippCopyToClipBoard text={data} type="password" />;
   }
 
+  // Handle hardware hash fields
+  const hardwareHashFields = ["hardwareHash", "Hardware Hash"];
+  if (hardwareHashFields.includes(cellName) || cellNameLower.includes("hardware")) {
+    if (typeof data === "string" && data.length > 15) {
+      return isText ? data : `${data.substring(0, 15)}...`;
+    }
+    return isText ? data : data;
+  }
+
   if (cellName === "RepeatsEvery") {
     //convert 1d to "Every 1 day", 1w to "Every 1 week" etc.
     const match = data.match(/(\d+)([a-zA-Z]+)/);
@@ -237,6 +259,10 @@ export const getCippFormatting = (data, cellName, type, canReceive, flatten = tr
       data = "Unknown";
     }
     return isText ? data : <Chip variant="outlined" label={data} size="small" color="info" />;
+  }
+
+  if (cellName === "delegatedPrivilegeStatus") {
+    return data === "directTenant" ? "Direct Tenant" : "GDAP Tenant";
   }
 
   //if the cellName is tenantFilter, return a chip with the tenant name. This can sometimes be an array, sometimes be a single item.
@@ -619,7 +645,17 @@ export const getCippFormatting = (data, cellName, type, canReceive, flatten = tr
     );
   }
 
-  const durationArray = ["autoExtendDuration"];
+  // ISO 8601 Duration Formatting
+  // Add property names here to automatically format ISO 8601 duration strings (e.g., "PT1H23M30S")
+  // into human-readable format (e.g., "1 hour 23 minutes 30 seconds") across all CIPP tables.
+  // This works for any API response property that contains ISO 8601 duration format.
+  const durationArray = [
+    "autoExtendDuration",        // GDAP page (/tenant/gdap-management/relationships)
+    "deploymentDuration",        // AutoPilot deployments (/endpoint/reports/autopilot-deployment)
+    "deploymentTotalDuration",   // AutoPilot deployments (/endpoint/reports/autopilot-deployment)
+    "deviceSetupDuration",       // AutoPilot deployments (/endpoint/reports/autopilot-deployment)
+    "accountSetupDuration"       // AutoPilot deployments (/endpoint/reports/autopilot-deployment)
+  ];
   if (durationArray.includes(cellName)) {
     isoDuration.setLocales(
       {
@@ -666,6 +702,24 @@ export const getCippFormatting = (data, cellName, type, canReceive, flatten = tr
 
   if (cellName === "AutoMapUrl") {
     return isText ? data : <CippCopyToClipBoard text={data} />;
+  }
+
+  // handle autocomplete labels
+  if (data?.label && data?.value) {
+    return isText ? data.label : <CippCopyToClipBoard text={data.label} type="chip" />;
+  }
+
+  // handle array of autocomplete labels
+  if (Array.isArray(data) && data.length > 0 && data[0]?.label && data[0]?.value) {
+    return isText
+      ? data.map((item) => item.label).join(", ")
+      : renderChipList(
+          data.map((item) => {
+            return {
+              label: item.label,
+            };
+          })
+        );
   }
 
   // Handle arrays of strings

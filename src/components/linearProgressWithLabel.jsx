@@ -1,4 +1,4 @@
-import { Box, LinearProgress, Typography } from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 
 export const LinearProgressWithLabel = (props) => {
   return (
@@ -6,7 +6,7 @@ export const LinearProgressWithLabel = (props) => {
       <Box sx={{ width: "100%", mr: 1 }}>
         <LinearProgress variant="determinate" {...props} />
       </Box>
-      <Box sx={{ minWidth: 100 }}>{`${Math.round(props.value)}% ${props?.addedLabel ?? ""}`}</Box>
+      <Box sx={{ minWidth: 135 }}>{`${Math.round(props.value)}% ${props?.addedLabel ?? ""}`}</Box>
     </Box>
   );
 };

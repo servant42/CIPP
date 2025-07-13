@@ -8,6 +8,8 @@ import {
   FormControl,
   FormLabel,
   RadioGroup,
+  Button,
+  Box,
 } from "@mui/material";
 import { CippAutoComplete } from "./CippAutocomplete";
 import { Controller, useFormState } from "react-hook-form";
@@ -25,9 +27,12 @@ import {
 import StarterKit from "@tiptap/starter-kit";
 import { CippDataTable } from "../CippTable/CippDataTable";
 import React from "react";
+import { AccessTime } from "@mui/icons-material";
 
 // Helper function to convert bracket notation to dot notation
+// Improved to correctly handle nested bracket notations
 const convertBracketsToDots = (name) => {
+  if (!name) return "";
   return name.replace(/\[(\d+)\]/g, ".$1"); // Replace [0] with .0
 };
 
@@ -44,6 +49,7 @@ export const CippFormComponent = (props) => {
     label,
     labelLocation = "behind", // Default location for switches
     defaultValue,
+    helperText,
     ...other
   } = props;
   const { errors } = useFormState({ control: formControl.control });
@@ -138,9 +144,13 @@ export const CippFormComponent = (props) => {
               type="password"
               variant="filled"
               fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
               {...other}
               {...formControl.register(convertedName, { ...validators })}
               label={label}
+              defaultValue={defaultValue}
             />
           </div>
           <Typography variant="subtitle3" color="error">
@@ -155,6 +165,9 @@ export const CippFormComponent = (props) => {
             <TextField
               type="number"
               variant="filled"
+              InputLabelProps={{
+                shrink: true,
+              }}
               {...other}
               {...formControl.register(convertedName, { ...validators })}
               label={label}
@@ -189,6 +202,11 @@ export const CippFormComponent = (props) => {
           <Typography variant="subtitle3" color="error">
             {get(errors, convertedName, {})?.message}
           </Typography>
+          {helperText && (
+            <Typography variant="subtitle3" color="text.secondary">
+              {helperText}
+            </Typography>
+          )}
         </>
       );
 
@@ -213,19 +231,26 @@ export const CippFormComponent = (props) => {
             <Controller
               name={convertedName}
               control={formControl.control}
+              defaultValue={defaultValue}
               rules={validators}
-              render={({ field }) => (
-                <RadioGroup {...field} {...other}>
-                  {props.options.map((option, idx) => (
-                    <FormControlLabel
-                      key={`${option.value}-${idx}`}
-                      value={option.value}
-                      control={<Radio />}
-                      label={option.label}
-                    />
-                  ))}
-                </RadioGroup>
-              )}
+              render={({ field }) => {
+                return (
+                  <RadioGroup
+                    value={field.value || ""}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    {...other}
+                  >
+                    {props.options.map((option, idx) => (
+                      <FormControlLabel
+                        key={`${option.value}-${idx}`}
+                        value={option.value}
+                        control={<Radio disabled={other?.disabled || option?.disabled} />}
+                        label={option.label}
+                      />
+                    ))}
+                  </RadioGroup>
+                );
+              }}
             />
           </FormControl>
           <Typography variant="subtitle3" color="error">
@@ -251,6 +276,7 @@ export const CippFormComponent = (props) => {
                   label={label}
                   multiple={false}
                   onChange={(value) => field.onChange(value?.value)}
+                  helperText={helperText}
                 />
               )}
             />
@@ -277,6 +303,7 @@ export const CippFormComponent = (props) => {
                   defaultValue={field.value}
                   label={label}
                   onChange={(value) => field.onChange(value)}
+                  helperText={helperText}
                 />
               )}
             />
@@ -390,38 +417,66 @@ export const CippFormComponent = (props) => {
               control={formControl.control}
               rules={validators}
               render={({ field }) => (
-                <DateTimePicker
-                  slotProps={{ textField: { fullWidth: true } }}
-                  views={
-                    other.dateTimeType === "date"
-                      ? ["year", "month", "day"]
-                      : ["year", "month", "day", "hours", "minutes"]
-                  }
-                  label={label}
-                  value={field.value ? new Date(field.value * 1000) : null} // Convert Unix timestamp to Date object
-                  onChange={(date) => {
-                    if (date) {
-                      const unixTimestamp = Math.floor(date.getTime() / 1000); // Convert to Unix timestamp
-                      field.onChange(unixTimestamp); // Pass the Unix timestamp to the form
-                    } else {
-                      field.onChange(null); // Handle the case where no date is selected
-                    }
-                  }}
-                  ampm={false}
-                  minutesStep={15}
-                  inputFormat="yyyy/MM/dd HH:mm" // Display format
-                  renderInput={(inputProps) => (
-                    <TextField
-                      {...inputProps}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <DateTimePicker
+                      slotProps={{ textField: { fullWidth: true } }}
+                      views={
+                        other.dateTimeType === "date"
+                          ? ["year", "month", "day"]
+                          : ["year", "month", "day", "hours", "minutes"]
+                      }
+                      label={label}
+                      value={field.value ? new Date(field.value * 1000) : null} // Convert Unix timestamp to Date object
+                      onChange={(date) => {
+                        if (date) {
+                          const unixTimestamp = Math.floor(date.getTime() / 1000); // Convert to Unix timestamp
+                          field.onChange(unixTimestamp); // Pass the Unix timestamp to the form
+                        } else {
+                          field.onChange(null); // Handle the case where no date is selected
+                        }
+                      }}
+                      ampm={false}
+                      minutesStep={15}
+                      inputFormat="yyyy/MM/dd HH:mm" // Display format
+                      renderInput={(inputProps) => (
+                        <TextField
+                          {...inputProps}
+                          {...other}
+                          fullWidth
+                          error={!!errors[convertedName]}
+                          helperText={get(errors, convertedName, {})?.message}
+                          variant="filled"
+                        />
+                      )}
                       {...other}
-                      fullWidth
-                      error={!!errors[convertedName]}
-                      helperText={get(errors, convertedName, {})?.message}
-                      variant="filled"
                     />
-                  )}
-                  {...other}
-                />
+                  </Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={other?.disabled}
+                    onClick={() => {
+                      const now = new Date();
+                      // Round to nearest 15-minute interval
+                      const minutes = now.getMinutes();
+                      const roundedMinutes = Math.round(minutes / 15) * 15;
+                      now.setMinutes(roundedMinutes, 0, 0); // Set seconds and milliseconds to 0
+                      const unixTimestamp = Math.floor(now.getTime() / 1000);
+                      field.onChange(unixTimestamp);
+                    }}
+                    sx={{
+                      height: '42px',
+                      minWidth: '42px',
+                      padding: '8px 12px',
+                      alignSelf: 'flex-end',
+                      marginBottom: '0px', // Adjust to align with input field
+                    }}
+                    title="Set to current date and time"
+                  >
+                    Now
+                  </Button>
+                </Box>
               )}
             />
           </div>

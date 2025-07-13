@@ -1,12 +1,9 @@
 import { BuildingOfficeIcon, HomeIcon, UsersIcon, WrenchIcon } from "@heroicons/react/24/outline";
 import {
-  Cloud,
   CloudOutlined,
-  DeviceHub,
   HomeRepairService,
   Laptop,
   MailOutline,
-  Shield,
   ShieldOutlined,
 } from "@mui/icons-material";
 import { SvgIcon } from "@mui/material";
@@ -87,8 +84,8 @@ export const nativeMenuItems = [
           },
           { title: "Audit Logs", path: "/tenant/administration/audit-logs" },
           {
-            title: "Enterprise Applications",
-            path: "/tenant/administration/enterprise-apps",
+            title: "Applications",
+            path: "/tenant/administration/applications/enterprise-apps",
           },
           { title: "Secure Score", path: "/tenant/administration/securescore" },
           {
@@ -210,6 +207,14 @@ export const nativeMenuItems = [
           },
         ],
       },
+      {
+        title: "Safe Links",
+        path: "/security/safelinks",
+        items: [
+          { title: "Safe Links Policies", path: "/security/safelinks/safelinks" },
+          { title: "Safe Links Templates", path: "/security/safelinks/safelinks-template" },
+        ],
+      },
     ],
   },
   {
@@ -258,6 +263,8 @@ export const nativeMenuItems = [
         path: "/endpoint/reports",
         items: [
           { title: "Analytics Device Score", path: "/endpoint/reports/analyticsdevicescore" },
+          { title: "Work from anywhere", path: "/endpoint/reports/workfromanywhere" },
+          { title: "Autopilot Deployments", path: "/endpoint/reports/autopilot-deployment" },
         ],
       },
     ],
@@ -307,6 +314,7 @@ export const nativeMenuItems = [
           { title: "Deleted Mailboxes", path: "/email/administration/deleted-mailboxes" },
           { title: "Mailbox Rules", path: "/email/administration/mailbox-rules" },
           { title: "Contacts", path: "/email/administration/contacts" },
+          { title: "Contact Templates", path: "/email/administration/contacts-template" },
           { title: "Quarantine", path: "/email/administration/quarantine" },
           {
             title: "Tenant Allow/Block Lists",
@@ -341,12 +349,17 @@ export const nativeMenuItems = [
             title: "Connection filter templates",
             path: "/email/spamfilter/list-connectionfilter-templates",
           },
+          {
+            title: "Quarantine Policies",
+            path: "/email/spamfilter/list-quarantine-policies",
+          },
         ],
       },
       {
         title: "Resource Management",
         path: "/email/resources/management",
         items: [
+          { title: "Equipment", path: "/email/resources/management/equipment" },
           { title: "Rooms", path: "/email/resources/management/list-rooms" },
           { title: "Room Lists", path: "/email/resources/management/room-lists" },
         ],
@@ -464,12 +477,12 @@ export const nativeMenuItems = [
     items: [
       { title: "Application Settings", path: "/cipp/settings", roles: ["admin", "superadmin"] },
       { title: "Logbook", path: "/cipp/logs", roles: ["editor", "admin", "superadmin"] },
-      { title: "SAM Setup Wizard", path: "/onboarding", roles: ["admin", "superadmin"] },
+      { title: "Setup Wizard", path: "/onboardingv2", roles: ["admin", "superadmin"] },
       { title: "Integrations", path: "/cipp/integrations", roles: ["admin", "superadmin"] },
       {
         title: "Custom Data",
         path: "/cipp/custom-data/directory-extensions",
-        roles: ["admin", "superadmin"]
+        roles: ["admin", "superadmin"],
       },
       {
         title: "Advanced",
